@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/api/tasks")
+@CrossOrigin(origins = "*")
 @Tag(name = "Task Management API", description = "Operations for tracking open tasks and function statuses")
 public class TaskController {
 

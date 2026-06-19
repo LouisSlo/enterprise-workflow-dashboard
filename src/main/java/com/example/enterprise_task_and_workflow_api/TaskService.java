@@ -29,6 +29,6 @@ public class TaskService {
         return taskRepository.findById(id).map(task -> {
             task.setStatus(newStatus);
             return taskRepository.save(task);
-        }).orElseThrow(() -> new RuntimeException("Task not found"));
+        }).orElseThrow(() -> new TaskNotFoundException("Task with ID " + id + " not found"));
     }
 }

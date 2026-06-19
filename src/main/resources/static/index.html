@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Workflow Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f1f5f9;
+            --surface-color: #ffffff;
+            --column-bg: #e2e8f0;
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding: 2rem;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--surface-color);
+            padding: 1.5rem 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-title h1 {
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .header-title p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        #status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            background: #f8fafc;
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            border: 1px solid var(--border-color);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #64748b;
+        }
+
+        .connected .status-dot { background-color: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); }
+        .disconnected .status-dot { background-color: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.4); }
+
+        .creator-section {
+            background: var(--surface-color);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .creator-section h2 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        #create-task-form {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .input-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: #f8fafc;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 45px;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            height: 45px;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* KANBAN BOARD */
+        .kanban-board {
+            display: flex;
+            gap: 1.5rem;
+            flex: 1;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+        }
+
+        .kanban-column {
+            flex: 1;
+            min-width: 280px;
+            background-color: var(--column-bg);
+            border-radius: var(--radius);
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+        }
+
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #cbd5e1;
+        }
+
+        .column-header h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #475569;
+        }
+
+        .task-count {
+            background: #cbd5e1;
+            color: #475569;
+            font-size: 0.75rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            flex: 1;
+        }
+
+        .task-card {
+            background: var(--surface-color);
+            border-radius: var(--radius);
+            padding: 1rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .task-id {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .task-title {
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            word-break: break-word;
+        }
+
+        .task-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .task-actions select {
+            width: 100%;
+            padding: 0.4rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .task-actions select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-title">
+        <h1>Enterprise Workflow</h1>
+        <p>Task Tracking & Management API Client</p>
+    </div>
+    <div id="status-indicator">
+        <div class="status-dot"></div>
+        <span id="status-text">Connecting...</span>
+    </div>
+</header>
+
+<div class="creator-section">
+    <h2>Add New Task</h2>
+    <form id="create-task-form">
+        <div class="input-group">
+            <input type="text" id="task-title" placeholder="Task Title (e.g., Update database schema)" required autocomplete="off">
+            <textarea id="task-desc" placeholder="Optional description..."></textarea>
+        </div>
+        <button type="submit">+ Create Task</button>
+    </form>
+</div>
+
+<div class="kanban-board">
+    <div class="kanban-column">
+        <div class="column-header">
+            <h3>Open</h3>
+            <span class="task-count" id="count-OPEN">0</span>
+        </div>
+        <div class="task-list" id="col-OPEN"></div>
+    </div>
+
+    <div class="kanban-column">
+        <div class="column-header">
+            <h3>In Progress</h3>
+            <span class="task-count" id="count-IN_PROGRESS">0</span>
+        </div>
+        <div class="task-list" id="col-IN_PROGRESS"></div>
+    </div>
+
+    <div class="kanban-column">
+        <div class="column-header">
+            <h3>In Testing</h3>
+            <span class="task-count" id="count-IN_TESTING">0</span>
+        </div>
+        <div class="task-list" id="col-IN_TESTING"></div>
+    </div>
+
+    <div class="kanban-column">
+        <div class="column-header">
+            <h3>Done</h3>
+            <span class="task-count" id="count-DONE">0</span>
+        </div>
+        <div class="task-list" id="col-DONE"></div>
+    </div>
+</div>
+
+<script>
+    const API_URL = 'http://localhost:8080/api/tasks';
+
+    // Fetch all tasks on load
+    async function fetchTasks() {
+        const statusIndicator = document.getElementById('status-indicator');
+        const statusText = document.getElementById('status-text');
+
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) throw new Error('Network response was not ok');
+            const tasks = await response.json();
+
+            statusIndicator.className = 'connected';
+            statusText.innerText = 'Backend Connected';
+
+            renderTasks(tasks);
+        } catch (error) {
+            console.error('Error fetching tasks:', error);
+            statusIndicator.className = 'disconnected';
+            statusText.innerText = 'Backend Disconnected';
+        }
+    }
+
+    // Create new task
+    document.getElementById('create-task-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const titleInput = document.getElementById('task-title');
+        const descInput = document.getElementById('task-desc');
+
+        const newTask = {
+            title: titleInput.value,
+            description: descInput.value
+        };
+
+        try {
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newTask)
+            });
+            titleInput.value = '';
+            descInput.value = '';
+            fetchTasks(); // Refresh list
+        } catch (error) {
+            console.error('Error creating task:', error);
+            alert("Failed to create task. Is the server running?");
+        }
+    });
+
+    // Update task status
+    async function updateStatus(id, newStatus) {
+        try {
+            await fetch(`${API_URL}/${id}/status?status=${newStatus}`, {
+                method: 'PATCH'
+            });
+            fetchTasks(); // Refresh list to reflect changes visually
+        } catch (error) {
+            console.error('Error updating status:', error);
+        }
+    }
+
+    // Render tasks to DOM in Kanban format
+    function renderTasks(tasks) {
+        // Define statuses
+        const statuses = ['OPEN', 'IN_PROGRESS', 'IN_TESTING', 'DONE'];
+
+        // Clear all columns and reset counts
+        statuses.forEach(status => {
+            document.getElementById(`col-${status}`).innerHTML = '';
+            document.getElementById(`count-${status}`).innerText = '0';
+        });
+
+        // Sort tasks by ID descending (newest on top)
+        tasks.sort((a, b) => b.id - a.id);
+
+        tasks.forEach(task => {
+            const column = document.getElementById(`col-${task.status}`);
+            if (!column) return; // Skip if status is unknown
+
+            // Update counter
+            const countBadge = document.getElementById(`count-${task.status}`);
+            countBadge.innerText = parseInt(countBadge.innerText) + 1;
+
+            const card = document.createElement('div');
+            card.className = 'task-card';
+
+            // Truncate description if too long or empty
+            const descHtml = task.description ? `<div class="task-desc">${task.description}</div>` : '';
+
+            card.innerHTML = `
+                    <div class="task-id">TASK-${task.id}</div>
+                    <div class="task-title">${task.title}</div>
+                    ${descHtml}
+                    <div class="task-actions">
+                        <select onchange="updateStatus(${task.id}, this.value)">
+                            <option value="OPEN" ${task.status === 'OPEN' ? 'selected' : ''}>OPEN</option>
+                            <option value="IN_PROGRESS" ${task.status === 'IN_PROGRESS' ? 'selected' : ''}>IN PROGRESS</option>
+                            <option value="IN_TESTING" ${task.status === 'IN_TESTING' ? 'selected' : ''}>IN TESTING</option>
+                            <option value="DONE" ${task.status === 'DONE' ? 'selected' : ''}>DONE</option>
+                        </select>
+                    </div>
+                `;
+            column.appendChild(card);
+        });
+    }
+
+    // Initial load
+    fetchTasks();
+</script>
+</body>
+</html>
