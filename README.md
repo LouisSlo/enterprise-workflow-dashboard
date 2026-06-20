@@ -6,7 +6,7 @@ A robust backend REST API designed for enterprise workflow management and task s
 This project was developed with a strong focus on clean code, automated testing, and proper exception handling, simulating a real-world enterprise environment.
 
 ## Technologies Used
-* **Java 17**
+* **Java 21**
 * **Spring Boot 3** (Web, Data JPA)
 * **H2 Database** (In-memory SQL database for rapid development and testing)
 * **JUnit 5 & Mockito** (Unit Testing)
